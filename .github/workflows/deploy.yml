@@ -1,25 +1,25 @@
 name: Deploy Assets Bundles
 
 on:
-    push:
-        branches:
-            - main
-            - qa
+  push:
+    branches:
+      - main
+      - qa
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v2
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-            - name: Set up Databricks CLI
-              uses: databricks/setup-cli@main
+      - name: Set up Databricks CLI
+        uses: databricks/setup-cli@main
 
-            - name: Run Deploy
-              run: databricks bundle deploy
-              working-directory: .
-              env:
-                  DATABRICKS_BUNDLE_ENV: ${{ github.ref_name}}
-                  DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-                  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      - name: Run Deploy
+        run: databricks bundle deploy
+        working-directory: .
+        env:
+          DATABRICKS_BUNDLE_ENV: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
