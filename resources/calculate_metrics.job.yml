@@ -1,0 +1,17 @@
+resources:
+  jobs:
+    metrics_job:
+      name: metrics_job
+
+      email_notifications:
+        on_failure:
+          - nicolas.mauvecin@lovelytics.com
+
+      tasks:
+        - task_key: calculate_metrics
+          notebook_task:
+            notebook_path: ../src/calculate_metrics.ipynb
+      
+      parameters:
+        - name: table_name
+          default: "" 
