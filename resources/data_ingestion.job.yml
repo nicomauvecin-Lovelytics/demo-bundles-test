@@ -1,0 +1,36 @@
+resources:
+  jobs:
+    ingest_data_job:
+      name: ingest_data_job
+
+      trigger:
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      email_notifications:
+        on_failure:
+          - nicolas.mauvecin@lovelytics.com
+
+      tasks:
+        - task_key: bronze_to_silver
+          notebook_task:
+            notebook_path: ../src/bronze_to_silver.ipynb
+
+        - task_key: silver_to_gold
+          depends_on: 
+            - task_key: bronze_to_silver
+          notebook_task:
+            notebook_path: ../src/silver_to_gold.ipynb
+
+        - task_key: for_each_table
+          depends_on: 
+            - task_key: silver_to_gold
+          for_each_task:
+            inputs: "{{tasks.silver_to_gold.values.table_names}}"
+            task:
+              task_key: calculate_metrics
+              run_job_task:
+                job_id: ${resources.jobs.metrics_job.id}
+                job_parameters: 
+                  table_name: "{{input}}"

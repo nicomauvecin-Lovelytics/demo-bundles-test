@@ -1,0 +1,36 @@
+bundle:
+  name: demo-asset-bundles
+
+include:
+  - resources/*.yml
+
+workspace: 
+  host: https://dbc-a58aec45-10d2.cloud.databricks.com/
+
+targets:
+  dev:
+    mode: development
+    default: true
+    presets:
+      name_prefix: "[dev ${workspace.current_user.short_name}] "
+  
+  qa:
+    mode: production
+    workspace:
+      # host: https://dbc-a58aec45-10d2.cloud.databricks.com/
+      file_path: /Workspace/${bundle.target}/${bundle.name}/
+      root_path: /Workspace/${bundle.target}/${bundle.name}/.bundle/
+
+  prod:
+    mode: production
+    workspace:
+      # host: https://dbc-a58aec45-10d2.cloud.databricks.com/
+      file_path: /Workspace/${bundle.target}/${bundle.name}/
+      root_path: /Workspace/${bundle.target}/${bundle.name}/.bundle/
+    presets:
+      trigger_pause_status: UNPAUSED
+
+presets:
+  trigger_pause_status: PAUSED
+  tags:
+    env: ${bundle.target}
